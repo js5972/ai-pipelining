@@ -1,0 +1,7 @@
+{
+  "groups": [
+    "urban",
+    "flood"
+  ],
+  "strategy": "concept_groups"
+}

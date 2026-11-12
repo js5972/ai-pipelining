@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local retrieval archives (retain or version separately for research releases)
+.runs/

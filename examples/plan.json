@@ -1,0 +1,21 @@
+{
+  "compiler": "0.1.0",
+  "registry_sha256": "6a523f065812b9b48430afa55bcff07ceb94e2a891fac7fbcfe05b605442cdd6",
+  "requests": [
+    {
+      "params": {
+        "per-page": 100,
+        "search": "\"urban\" AND \"flood\""
+      },
+      "query_id": "36abceb4a021c0fc"
+    }
+  ],
+  "spec": {
+    "groups": [
+      "urban",
+      "flood"
+    ],
+    "strategy": "concept_groups"
+  },
+  "version": 1
+}

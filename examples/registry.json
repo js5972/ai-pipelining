@@ -1,0 +1,269 @@
+{
+  "algorithm": "sentence-ngram-tfidf-v1",
+  "documents_sha256": "a578782ad7e374199ab3786f84f47579d10c97ffd1fc9f74873d4958ea889253",
+  "max_words": 3,
+  "terms": [
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Urban flood prediction",
+          "section": "title"
+        },
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "flood prediction",
+      "score": 3.38629436,
+      "status": "proposed",
+      "term_id": "faaedd22dde1389f",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "flood prediction uses",
+      "score": 3.0,
+      "status": "proposed",
+      "term_id": "de1021324b7e0bed",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "prediction uses machine",
+      "score": 3.0,
+      "status": "proposed",
+      "term_id": "3c3012fc694cf051",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Urban flood prediction",
+          "section": "title"
+        }
+      ],
+      "preferred_label": "urban flood prediction",
+      "score": 3.0,
+      "status": "proposed",
+      "term_id": "4541619a3e4d66ac",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "uses machine learning",
+      "score": 3.0,
+      "status": "proposed",
+      "term_id": "89826fb9be7a1af0",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "machine learning",
+      "score": 2.0,
+      "status": "proposed",
+      "term_id": "dcaa8e5ecb8d70ad",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "prediction uses",
+      "score": 2.0,
+      "status": "proposed",
+      "term_id": "e373fda02949c729",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Urban flood prediction",
+          "section": "title"
+        }
+      ],
+      "preferred_label": "urban flood",
+      "score": 2.0,
+      "status": "proposed",
+      "term_id": "ead09127ce812506",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "uses machine",
+      "score": 2.0,
+      "status": "proposed",
+      "term_id": "34a305b0acf1a937",
+      "variants": []
+    },
+    {
+      "concept_group": "flood",
+      "decision": {
+        "rationale": "Synthetic test",
+        "reviewer": "fixture"
+      },
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Urban flood prediction",
+          "section": "title"
+        },
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "flood",
+      "score": 1.69314718,
+      "status": "approved",
+      "term_id": "d8864644c15d33be",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Urban flood prediction",
+          "section": "title"
+        },
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "prediction",
+      "score": 1.69314718,
+      "status": "proposed",
+      "term_id": "70ad7b8f9a1c6c89",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "learning",
+      "score": 1.0,
+      "status": "proposed",
+      "term_id": "edd95740e339e6aa",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "machine",
+      "score": 1.0,
+      "status": "proposed",
+      "term_id": "bc020a35b7f9cb13",
+      "variants": []
+    },
+    {
+      "concept_group": "urban",
+      "decision": {
+        "rationale": "Synthetic test",
+        "reviewer": "fixture"
+      },
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Urban flood prediction",
+          "section": "title"
+        }
+      ],
+      "preferred_label": "urban",
+      "score": 1.0,
+      "status": "approved",
+      "term_id": "e5909c3cc473fb34",
+      "variants": []
+    },
+    {
+      "concept_group": null,
+      "decision": null,
+      "evidence": [
+        {
+          "document_id": "seed-1",
+          "passage": "Flood prediction uses machine learning",
+          "section": "abstract"
+        }
+      ],
+      "preferred_label": "uses",
+      "score": 1.0,
+      "status": "proposed",
+      "term_id": "f480ffb2979d1888",
+      "variants": []
+    }
+  ],
+  "version": 1
+}

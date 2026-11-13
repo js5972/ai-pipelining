@@ -1,0 +1,12 @@
+# Frozen query (gate G3). Only a human sets approved: true.
+# Start from runs/<id>_group_unions/query_draft.yaml.
+approved: false
+approved_by: ""
+approved_on: ""                 # YYYY-MM-DD
+description: ""                 # what this query is, e.g. "baseline: legacy list, all terms ORed"
+keywords_file: data/02_keywords/keywords.csv
+keywords_sha256: ""             # filled from the draft; retrieval warns if keywords.csv changed since
+settings:                       # retrieval uses these, not config/project.yaml
+  corpus: core
+  search_param: search.title_abstract_keywords
+queries: []                     # one or more search strings; results are unioned (de-duplicated IDs)

@@ -1,0 +1,72 @@
+# All settings, thresholds and budget for the pipeline. Scripts read nothing else.
+# Changing a value here changes results: record it in docs/decisions.md.
+
+project:
+  name: "my-topic"                  # short name, used in run metadata
+  scope_file: data/00_scope/scope.md
+
+openalex:
+  base_url: https://api.openalex.org
+  api_key_env: OPENALEX_API_KEY     # name of the environment variable holding the key
+  corpus: core                      # core | all | expansion           (D-001)
+  search_param: search.title_abstract_keywords   # title + abstract + OpenAlex keywords (D-007)
+  quote_phrases: true               # search multi-word terms as exact phrases (D-006)
+  reported_cost_unit: credits       # unit of meta.cost: credits | usd -- verify with 00_smoke_test.py
+  credit_usd: 0.0001                # 1 credit = $0.0001
+  request_timeout_s: 30
+  max_retries: 5
+  pause_s: 0.05                     # pause between requests (~20/s, under the 30/s free limit)
+  max_consecutive_failures: 5       # stop a run instead of retrying into a wall of errors
+  max_query_chars: 3500             # longer OR-queries are split into chunks
+
+prices_usd:                         # published prices per request
+  singleton: 0.0
+  list: 0.0001
+  search: 0.001
+
+budget:
+  daily_usd: 1.00                   # free key
+  stop_fraction: 0.80               # scripts stop at 80% of the daily budget
+  spent_today_usd: 0.00             # set by hand if credit was already used today
+  confirm_above_usd: 0.10           # scripts ask before spending more than this
+
+thresholds:                         # see docs/metrics.md
+  large_count: 50000
+  redundant_share: 0.01
+  large_gain_share: 0.10
+  mostly_new: 0.50
+
+sampling:
+  seed: 42
+  size: 30                          # works per sample sheet (max 100 per request)
+
+extraction:
+  ngram_min: 1
+  ngram_max: 3
+  min_doc_freq: 2                   # keep frequency candidates seen in >= N documents
+  top_n_frequency: 300
+  keybert_model: all-MiniLM-L6-v2
+  keybert_top_n_per_chunk: 5
+  keybert_diversity: 0.5            # MMR diversity
+  chunk_words: 200                  # embedding models truncate long input; documents are chunked
+
+retrieval:
+  fields:                           # fields fetched in phase 2 (select=)
+    - id
+    - doi
+    - display_name
+    - publication_year
+    - publication_date
+    - type
+    - language
+    - primary_location
+    - authorships
+    - primary_topic
+    - topics
+    - keywords
+    - abstract_inverted_index
+    - cited_by_count
+    - referenced_works
+    - open_access
+    - is_xpac
+  records_per_file: 10000

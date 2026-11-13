@@ -1,46 +1,76 @@
-# ai-pipelining
+# OpenAlex keyword pipeline
 
-A first reproducible literature-search pilot, based on the supplied design conversation. Python 3.12+, standard library only; no installation or external model needed for offline execution.
+A reproducible, human-centred pipeline for:
 
-```sh
-cd /workspace/ai-pipelining
-python -m unittest discover -s tests -v
-python -m examples.offline_demo
-python -m pipeline --help
+1. **Building a keyword list** for a research topic, from source documents (reports, papers) and expert review.
+2. **Validating that list** against OpenAlex with cheap count queries.
+3. **Retrieving the metadata** of all matching works from the OpenAlex API.
+
+Agents (Codex, Claude, …) can run and extend the pipeline. **Humans approve every decision that changes what gets retrieved.** Everything an agent or a person decides is written to a file in this repo.
+
+## Design principles
+
+- **Plain files, plain scripts.** CSV, YAML, JSONL. One numbered script per stage, run in order. No database, no orchestration framework.
+- **Approved inputs live in `data/` (versioned). Generated outputs live in `runs/` (not versioned).**
+- **Every run is traceable.** Each script creates `runs/<run_id>/` with `run_metadata.json` (git commit, config hash, input file hashes, package versions) and, for API stages, a `request_log.jsonl` with every request, its cost and its timing.
+- **Human gates are enforced in code.** The retrieval script refuses to run unless `data/04_query/query.yaml` says `approved: true`.
+- **Budget limits are enforced in code**, not left to an agent's discretion.
+
+## Quick start
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"            # core: API stages
+pip install -e ".[extract]"        # optional: keyword extraction from PDFs (pypdf, scikit-learn, KeyBERT)
+
+cp .env.example .env               # then put your key in .env
+export $(grep -v '^#' .env | xargs)
+
+python scripts/00_smoke_test.py --term "green bond"
+pytest
 ```
 
-The demo uses **synthetic documents and API responses**, not real papers or retrieval-quality evidence. Run it again to exercise archive reuse. Delete only `.runs/offline-demo` to generate a new synthetic run.
+## Workflow at a glance
 
-## Workflow
+| Stage | Script | Reads | Writes | Human gate |
+|---|---|---|---|---|
+| 0. Scope | (manual) | — | `data/00_scope/scope.md`, `seeds.csv` | **G1: scope approved** |
+| 1. Parse sources | `01_parse_sources.py` | `data/01_sources/*.pdf` | `runs/…/texts/` | — |
+| 2. Extract candidates | `02_extract_candidates.py` | parsed texts | `runs/…/candidates.csv` | — |
+| 3. Review sheet | `03_review_sheet.py` | candidates | `runs/…/review_sheet.csv` | **G2: keyword list approved** → `data/02_keywords/keywords.csv` |
+| 4. Term counts | `04_term_counts.py` | keywords | `runs/…/term_counts.csv` | — |
+| 5. Variant gain | `05_variant_gain.py` | keywords | `runs/…/variant_gain.csv` | decisions back into keywords |
+| 6. Group unions | `06_group_unions.py` | keywords | `runs/…/group_unions.csv`, `query_draft.yaml` | — |
+| 7. Relevance | `07_relevance.py` | query, seeds | `runs/…/seed_recall.csv`, `sample_*.csv` | labels → `data/03_labels/labels.csv` |
+| 8. Retrieve | `08_retrieve.py` | `data/04_query/query.yaml` | `runs/…/ids.txt`, `records.jsonl.gz` | **G3: query approved** (required) |
 
-1. Supply a JSON array of documents with unique `id`, `title`, and `abstract` fields (see `examples/documents.json`). Preserve original sources separately. This pilot accepts structured text, not PDFs.
-2. Generate proposals:
-   `python -m pipeline extract examples/documents.json .runs/candidates.json`
-3. Review the registry. For chosen terms, set `status` to `approved`, assign `concept_group`, and record `decision` with `reviewer` and `rationale`. Evidence is retained from the seed text. Unapproved terms never compile. `examples/registry.json` is a reviewed synthetic fixture, not a scientific vocabulary.
-4. Write a query specification with `strategy` (`concept_groups` or exploratory `all_or`), required `groups`, optional `max_requests` (default 100), and optional `filters`: `from_publication_date`, `to_publication_date`, `language`, `type`.
-5. Compile:
-   `python -m pipeline compile examples/registry.json examples/query-spec.json .runs/plan.json`
-6. Retrieve a frozen plan into a **new run directory**:
-   `python -m pipeline retrieve .runs/plan.json .runs/live-001`
-   Set `OPENALEX_API_KEY` securely in the environment if required by the service. The client sends it only to `https://api.openalex.org`; it is excluded from archived parameters and HTTP error messages. Live access requires this domain in environment settings.
-7. Replay without network access:
-   `python -m pipeline replay .runs/live-001`
-8. Evaluate with:
-   `python -m pipeline evaluate .runs/live-001/corpus.json benchmark.json .runs/metrics.json`
-   Benchmark rows require `id`, `relevant` (boolean), `eligible` (confirmed present/in scope in OpenAlex), and `split` (`seed` or `held_out`). Mark manually sampled/labelled rows `sampled: true` for precision. Seeds and ineligible papers are excluded from held-out recall. Sampling and eligibility verification are currently manual; precision is meaningful only for a properly constructed sample.
+Stages 4–7 form a loop: results feed decisions back into `keywords.csv` until the query is good enough to freeze.
 
-## Reproducibility contract
+Full details: [`docs/workflow.md`](docs/workflow.md).
 
-Candidate extraction normalizes Unicode and case, extracts sentence-bounded 1–3-word phrases from title/abstract, excludes a fixed stopword set, scores with length-adjusted TF-IDF, and breaks score ties lexically. It is an intentionally modest baseline. Source-document hashes, passages, and algorithm settings are stored. It does not prove semantic usefulness.
+## Repository map
 
-The compiler enumerates one quoted phrase per concept group, joined with `AND`, and unions responses across combinations. This preserves the intended group logic rather than unioning independent group searches. It rejects unsupported phrase characters and excessive expansion. **Live OpenAlex Boolean/phrase behavior has not been validated in this environment**; treat live retrieval as experimental until representative probes and benchmark review pass.
+```
+AGENTS.md                 rules for coding agents (read first)
+config/project.yaml       all settings, thresholds and budget, in one place
+data/                     approved inputs and human decisions (versioned)
+  00_scope/               topic definition and seed papers
+  01_sources/             source documents for extraction (PDFs not committed)
+  02_keywords/            keywords.csv: the approved keyword table
+  03_labels/              human relevance labels
+  04_query/               query.yaml: the frozen, approved query
+docs/                     workflow, decisions log, metric definitions, data contracts, OpenAlex notes, backlog
+notebooks/                exploration only; never the source of truth
+runs/                     one folder per script run (generated, not versioned)
+scripts/                  numbered stage scripts
+src/kwpipe/               small shared library (config, runs, OpenAlex client, queries, keywords, metrics)
+tests/                    unit tests for the library
+```
 
-Every run saves its exact plan, hashes, Python/code versions, Git commit and dirty state, credential-free request parameters, timestamps, raw pages, cursors, completion flag, and deduplicated corpus with query membership. Commit reviewed source/configuration before research runs: a dirty Git flag does not preserve uncommitted source. The client retries selected HTTP errors up to four attempts and checkpoints each successful page. Resume using the same directory/plan; use a new directory for refreshes. Interrupted pages may be fetched again. Replay verifies plan/page checksums and rejects incomplete runs. Retain archives: a publication-date filter does not freeze OpenAlex data.
+## Starting from an existing keyword list
 
-## Scope and next experiments
+```bash
+python scripts/00_import_legacy_keywords.py --input path/to/old_list.xlsx --status approved
+```
 
-Implemented: deterministic extraction, evidence registry, approval gate, concept/all-OR compilation, cursor retrieval/resume, raw archives, replay, deduplication, and basic held-out metrics; tests use a simulated API.
-
-Still needed for the research milestone: your research question and seed/held-out papers; PDF/XML parsing and quality flags; stronger schema/provenance validation; pinned semantic extraction and rank fusion; fixed-seed sampling and marginal-yield/subtopic analysis; live query semantics, API limits, authentication and completeness/count checks; source snapshots and release packaging. No claims of retrieval accuracy follow from fixture tests.
-
-Agents should propose registry changes for review, then invoke the same versioned CLI. They should not silently approve terms or modify a frozen run.
+This maps the legacy columns (`keyword_term`, `term_type`, `primary_group`, `category`, `usage_recommendation`) to the schema in [`docs/data_contracts.md`](docs/data_contracts.md) and flags encoding problems. Importing with `--status approved` makes the old list usable as the **baseline** for stages 4–7.
